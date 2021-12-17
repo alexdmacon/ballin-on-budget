@@ -39,10 +39,8 @@ self.addEventListener("activate", function (event) {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.url.includes("/api/")) {
-      
     event.respondWith(
-      caches.open(DATA_CACHE_NAME)
-      .then((cache) => {
+      caches.open(DATA_CACHE_NAME).then((cache) => {
         return fetch(event.request)
           .then((response) => {
             if (response.status === 200) {
@@ -59,10 +57,8 @@ self.addEventListener("fetch", (event) => {
   }
 
   event.respondWith(
-    caches.open(CACHE_NAME)
-    .then((cache) => {
-      return cache.match(event.request)
-      .then((response) => {
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.match(event.request).then((response) => {
         return response || fetch(event.request);
       });
     })

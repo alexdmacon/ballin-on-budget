@@ -1,16 +1,17 @@
 // create variable for database
 let db;
 
-// creating a new request to create a database called "BudgetDB"
-const request = indexedDB.open("BudgetDB", 1);
+// creating a new request to create a database called "budget"
+const request = indexedDB.open("budget", 1);
+
+const { oldVersion } = e;
+const newVersion = e.newVersion || db.version;
 
 request.onupgradeneeded = function (event) {
   const db = event.target.result;
 
-
-  if (db.objectStoreNames.length === 0) {
   db.createObjectStore("BudgetStore", { autoIncrement: true });
-  }
+
 };
 
 request.onerror = function (event) {
@@ -23,12 +24,12 @@ request.onsuccess = function (event) {
 
   if (navigator.onLine) {
     console.log("We are online, reading from db");
-    checkDB();
+    checkDatabase();
   }
 };
 
 
-function checkDB() {
+function checkDatabase() {
   console.log("check db invoked");
 
   // Open a transaction on your BudgetStore db
@@ -70,7 +71,7 @@ function checkDB() {
 
 // this is called by the sendTransaction function in index.js. if sendTransaction doesn't work (because the user is offline) and errors, then saveRecord is invoked to add add the posted record to the offline database, aka the indexed db. Can be retrieved when we go back online.
 const saveRecord = (record) => {
-  console.log("Save record invoked");
+  console.log("Saving to indexed DB");
 
   const transaction = db.transaction(["BudgetStore"], "readwrite");
 
@@ -81,4 +82,4 @@ const saveRecord = (record) => {
 
 
 // if app goes online, then call checkDB function to refresh from database.
-window.addEventListener("online", checkDB);
+window.addEventListener("online", checkDatabase);

@@ -4,18 +4,23 @@ let db;
 // creating a new request to create a database called "budget"
 const request = indexedDB.open("budget", 1);
 
-const { oldVersion } = e;
-const newVersion = e.newVersion || db.version;
-
 request.onupgradeneeded = function (event) {
-  const db = event.target.result;
+  console.log('Upgrade needed in IndexDB');
 
-  db.createObjectStore("BudgetStore", { autoIncrement: true });
+  const { oldVersion } = event;
+  const newVersion = event.newVersion || db.version;
 
+  console.log(`DB Updated from version ${oldVersion} to ${newVersion}`);
+
+  db = event.target.result;
+
+  if (db.objectStoreNames.length === 0) {
+    db.createObjectStore('BudgetStore', { autoIncrement: true });
+  }
 };
 
 request.onerror = function (event) {
-  console.log(`You broke it: ${event.target.errorCode}`);
+  console.log(`Error: ${event.target.errorCode}`);
 };
 
 request.onsuccess = function (event) {
@@ -71,7 +76,7 @@ function checkDatabase() {
 
 // this is called by the sendTransaction function in index.js. if sendTransaction doesn't work (because the user is offline) and errors, then saveRecord is invoked to add add the posted record to the offline database, aka the indexed db. Can be retrieved when we go back online.
 const saveRecord = (record) => {
-  console.log("Saving to indexed DB");
+  console.log("Save record invoked");
 
   const transaction = db.transaction(["BudgetStore"], "readwrite");
 
